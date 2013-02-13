@@ -1,0 +1,30 @@
+It is possible to find everything that is needed to run WMP-Editor at the project's Github repository~\cite{WMP-code}. But first, it is worthy to mention the exceptions related to hardware.
+
+\subsection{Hardware compatiblity issues}
+
+As of the time of this report, it is necessary to have a wireless card with the Broadcom chipset $4311$v1 or $4318$. This is not an obstacle for testing WMP-Editor, but in order to test the work it is imperative to have a compliant card. Instructions on how to flash the firmware and other compatibility tasks that must be performed, can be found in the documentation folder of~\cite{WMP-code} (Chapter $8$).
+
+\subsection{Running the WMP-Editor}
+
+WMP-Editor is written in Java, and also can be downloaded from~\cite{WMP-code}. Navigating to \emph{wmp-editor/wmpeditor-v2.37/} reveals the \texttt{WMPEditor.jar} file. In order to execute it, just \texttt{cd} to the mentioned directory and type: \texttt{java -jar WMPEditor.jar} to open WMP-Editor.
+
+Once inside, it is possible to open other \texttt{.sm} files like the ones under \emph{mac-example/dcf/} through the \emph{file} menu on the top left corner. The \texttt{dcf-master.sm} example is shown in Figure~\ref{fig:WMP-EditorLayout}.
+
+\subsection{Current state of our implementation}
+
+Today we had the opportunity of getting a question answered by one of FLAVIA team member. This was related to the adjustment of the backoff value through a \texttt{0x0D TX\_PKT\_SCHEDULER} action parameter, namely \texttt{BACKOFF SLOT}.
+
+As of now, I believe this measure just resets the backoff counter to the specified value. I could not find any other indication that this behavior can be further adjusted. Nevertheless, the option \texttt{STD} of the same \texttt{BACKOFF SLOT} parameter is supposed to mimic the behavior of DCF. 
+
+As for further software requirements: there are a lot of files in the Github repository, and rather fewer are the ones with clear documentation.
+
+In relation to the hardware requirements, the wireless card used in the documentation is called \emph{Broadcom Air Force One}, and what I believe to be a similar model can be found at~\cite{card}. 
+
+Summarizing the questions resulting from this first report:
+
+\begin{enumerate}
+	\item \emph{Where is the \texttt{STD} parameter programmed}?
+	\item \emph{Can we modify it to behave as our new backoff scheme}?
+	\item \emph{Do we have all what we need to try the different MAC protocols provided as examples?}
+\end{enumerate}
+

@@ -1,0 +1,100 @@
+% \documentclass[a4paper,journal]{IEEEtran}
+\documentclass[conference]{IEEEtran}
+%% INFOCOM 2013 addition:
+\makeatletter
+\def\ps@headings{%
+\def\@oddhead{\mbox{}\scriptsize\rightmark \hfil \thepage}%
+\def\@evenhead{\scriptsize\thepage \hfil \leftmark\mbox{}}%
+\def\@oddfoot{}%
+\def\@evenfoot{}}
+\makeatother
+\pagestyle{headings}
+\usepackage{psfrag}
+
+% \usepackage{auto-pst-pdf}
+
+%for using the therefore symbol
+\usepackage{amssymb}
+%end
+
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{color, colortbl}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{footnote}
+\usepackage{cite}
+%The below is used to add notes to tables without disrupting the IEEEtran format
+\usepackage{threeparttable}
+
+% Disable below if wanting to comply exclusively to conference mode of IEEEtran
+% \IEEEoverridecommandlockouts
+
+\makesavenoteenv{tabular}
+
+%Ignores \vbox errors below the level of 10000
+% \vbadness=10000
+
+
+
+\begin{document}
+%opening
+ \title{Technical report: WMP-Editor}
+
+
+%A more simple output, useful when involving people from different affiliations
+  %\author{
+    %  \IEEEauthorblockN{Luis Sanabria-Russo\IEEEauthorrefmark{0}, Jaume Barcelo\IEEEauthorrefmark{0}, Boris Bellalta\IEEEauthorrefmark{0}}\\
+      %\IEEEauthorblockA{\IEEEauthorrefmark{0}Universitat Pompeu Fabra, Barcelona, Spain
+      %\\\{luis.sanabria, jaume.barcelo, boris.bellalta\}@upf.edu}
+  %}
+
+\author{Luis Sanabria-Russo}
+
+%This is the style of three columns, as indicated in IEEEtran
+% \author{\IEEEauthorblockN{Luis Sanabria-Russo}
+%  \IEEEauthorblockA{Department of Information\\
+%  and Communications Technologies\\
+%  Universitat Pompeu Fabra\\
+%  Barcelona, Spain\\
+%  Email: luis.sanabria@upf.edu}
+%  \and
+%  \IEEEauthorblockN{Jaume Barcelo}
+%  \IEEEauthorblockA{Department of Information\\
+%  and Communications Technologies\\
+%  Universitat Pompeu Fabra\\
+%  Barcelona, Spain\\
+%  Email: cristina.cano@upf.edu}
+%  \and
+%  \IEEEauthorblockN{Boris Bellalta}
+%  \IEEEauthorblockA{Department of Information\\
+%  and Communications Technologies\\
+%  Universitat Pompeu Fabra\\
+%  Barcelona, Spain\\
+%  Email: boris.bellalta@upf.edu}}
+
+
+\maketitle
+
+\begin{abstract}
+
+\boldmath This report covers the technical aspects of the implementation of CSMA/ECA in Wireless MAC Processors (WMP). Upon each iteration, the abstract will change and its sections will probably lengthen and increase in number. This first version covers the aspects related to WMP-Editor layout and parameters. Also, the last section is composed of the current highlights on the research.
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+WMP, MAC, Collision-free, CSMA/ECA.
+\end{IEEEkeywords}
+
+\section{Introduction} \label{introduction}
+  \input{intro}
+\section{Implementation} \label{implementation}
+  \input{implementation}
+  
+\bibliographystyle{Classes/IEEEtran}
+\bibliography{IEEEabrv,ref}
+  
+\end{document}
