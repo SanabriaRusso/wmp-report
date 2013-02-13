@@ -12,19 +12,57 @@ Once inside, it is possible to open other \texttt{.sm} files like the ones under
 
 \subsection{Current state of our implementation}
 
-Today we had the opportunity of getting a question answered by one of FLAVIA team member. This was related to the adjustment of the backoff value through a \texttt{0x0D TX\_PKT\_SCHEDULER} action parameter, namely \texttt{BACKOFF SLOT}.
+We now know that the action \texttt{TX\_PKT\_SCHEDULER} seems to assign a transmission slot. The normal Binary Exponential Backoff (BEB) rule is set when using the option \texttt{STD} for this action. \texttt{TX\_PKT\_SCHEDULER} picks a random backoff between $0$ and the minimum contention window ($CW_{\min}$) and decrements it by every passing empty slot until the counter expires. When this happens, a tranmission is attempted.
 
-As of now, I believe this measure just resets the backoff counter to the specified value. I could not find any other indication that this behavior can be further adjusted. Nevertheless, the option \texttt{STD} of the same \texttt{BACKOFF SLOT} parameter is supposed to mimic the behavior of DCF. 
+There is also an option to further modify the contention parameters. Actions \texttt{CONTENTION\_PARAMS\_UPDATE\_SUCCESS} and \texttt{CONTENTION\_PARAMS\_UPDATE\_FAIL} modify the contention window according to the result of the transmission. It is determined as a success when an ACK is received, and a failure otherwise.
 
-As for further software requirements: there are a lot of files in the Github repository, and rather fewer are the ones with clear documentation.
+According to the documentation, each of the mentioned actions is ruled by the \emph{Backoff Params} section on the lower left-hand side of WMP-Editor. Successes update the contention window value according to~(\ref{eq:inflation}), while failures do so as (\ref{eq:deflation}).
 
-In relation to the hardware requirements, the wireless card used in the documentation is called \emph{Broadcom Air Force One}, and what I believe to be a similar model can be found at~\cite{card}. 
+\begin{equation} \label{eq:inflation}
+  CW = 2\times\texttt{INFLATION\_MUL}+\texttt{INFLATION\_ADD}
+\end{equation}
 
-Summarizing the questions resulting from this first report:
+\begin{equation} \label{eq:deflation}
+  CW = \frac{2}{\texttt{DEFLATION\_DIV}}-\texttt{DEFLATION\_SUB}
+\end{equation}
 
-\begin{enumerate}
-	\item \emph{Where is the \texttt{STD} parameter programmed}?
-	\item \emph{Can we modify it to behave as our new backoff scheme}?
-	\item \emph{Do we have all what we need to try the different MAC protocols provided as examples?}
-\end{enumerate}
+The terms in the equation are defined as:
+
+\begin{itemize}
+ \item \texttt{INFLATION\_MUL}: is a multiplier with default value of $2$ up to $8$.
+ \item \texttt{INFLATION\_ADD}: with default value of $1$ up to $65535$.
+ \item \texttt{DEFLATION\_DIV}: with a default value of $1$ up to $8$.
+ \item \texttt{DEFLATION\_SUB}: with a default value of $65535$.
+\end{itemize}
+
+What is curious about these calculations is that they seem to be wrong. After a successful transmission~(\ref{eq:deflation}), the contention window is reset to zero because the evaluation results in a CW below the allowed limit. 
+
+In the failure case~(\ref{eq:inflation}), assuming $CW_{\min}=16$, after the action \texttt{CONTENTION\_PARAMS\_UPDATE\_FAIL}, $CW=5$ evertyime. This is obviously wrong.
+
+Furthermore, after a successful or a failed transmission attempt the flow redirects the MAC to the Idle state. Supposing the station has another packet in the queue, then it will execute the \texttt{TX\_PKT\_SCHEDULER} action: recomputing a backoff.
+
+From here, some questions are derived:
+
+\begin{itemize}
+ \item Suppose we adjust \texttt{DEFLATION\_DIV} and \texttt{DEFLATION\_SUB} so the contention window (CW) is not reset after a successful transmission (\emph{Hysteresis}). Will \texttt{TX\_PKT\_SCHEDULER} recompute a random backoff $B\in[0,CW]$?
+ \item Can we assign a backoff slot for transmission that depends on the current value of CW?
+ \item How does \texttt{STD} work? Can we modify this rule?
+\end{itemize}
+
+
+% Today we had the opportunity of getting a question answered by one of FLAVIA team member. This was related to the adjustment of the backoff value through a \texttt{0x0D TX\_PKT\_SCHEDULER} action parameter, namely \texttt{BACKOFF SLOT}.
+% 
+% As of now, I believe this measure just resets the backoff counter to the specified value. I could not find any other indication that this behavior can be further adjusted. Nevertheless, the option \texttt{STD} of the same \texttt{BACKOFF SLOT} parameter is supposed to mimic the behavior of DCF. 
+% 
+% As for further software requirements: there are a lot of files in the Github repository, and rather fewer are the ones with clear documentation.
+% 
+% In relation to the hardware requirements, the wireless card used in the documentation is called \emph{Broadcom Air Force One}, and what I believe to be a similar model can be found at~\cite{card}. 
+% 
+% Summarizing the questions resulting from this first report:
+% 
+% \begin{enumerate}
+% 	\item \emph{Where is the \texttt{STD} parameter programmed}?
+% 	\item \emph{Can we modify it to behave as our new backoff scheme}?
+% 	\item \emph{Do we have all what we need to try the different MAC protocols provided as examples?}
+% \end{enumerate}
 
