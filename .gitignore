@@ -6,3 +6,6 @@
 *.blg
 *.dvi
 *.log
+*eps-converted-to.pdf
+*_diff.tex
+*_diff.pdf

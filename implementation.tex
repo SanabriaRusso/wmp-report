@@ -19,37 +19,56 @@ There is also an option to further modify the contention parameters. Actions \te
 According to the documentation, each of the mentioned actions is ruled by the \emph{Backoff Params} section on the lower left-hand side of WMP-Editor. Successes update the contention window value according to~(\ref{eq:inflation}), while failures do so as (\ref{eq:deflation}).
 
 \begin{equation} \label{eq:inflation}
-  CW = 2\times\texttt{INFLATION\_MUL}+\texttt{INFLATION\_ADD}
+  CW = CW_{cur}\times\texttt{INFLATION\_MUL}+\texttt{INFLATION\_ADD}
+  %CW = 2\times\texttt{INFLATION\_MUL}+\texttt{INFLATION\_ADD}
 \end{equation}
 
 \begin{equation} \label{eq:deflation}
-  CW = \frac{2}{\texttt{DEFLATION\_DIV}}-\texttt{DEFLATION\_SUB}
+  CW = \frac{CW_{cur}}{\texttt{DEFLATION\_DIV}}-\texttt{DEFLATION\_SUB}
+  %CW = \frac{2}{\texttt{DEFLATION\_DIV}}-\texttt{DEFLATION\_SUB}
 \end{equation}
 
 The terms in the equation are defined as:
 
 \begin{itemize}
+ \item $CW_{cur}$: is the current Contention Window.
  \item \texttt{INFLATION\_MUL}: is a multiplier with default value of $2$ up to $8$.
  \item \texttt{INFLATION\_ADD}: with default value of $1$ up to $65535$.
  \item \texttt{DEFLATION\_DIV}: with a default value of $1$ up to $8$.
  \item \texttt{DEFLATION\_SUB}: with a default value of $65535$.
 \end{itemize}
 
-What is curious about these calculations is that they seem to be wrong. After a successful transmission~(\ref{eq:deflation}), the contention window is reset to zero because the evaluation results in a CW below the allowed limit. 
+\subsection{Basic ECA}
 
-In the failure case~(\ref{eq:inflation}), assuming $CW_{\min}=16$, after the action \texttt{CONTENTION\_PARAMS\_UPDATE\_FAIL}, $CW=5$ evertyime. This is obviously wrong.
+By looking at the available parameters one can device the way of implementing Basic ECA (setting a deterministic backoff, $B_{d}=CW_{\min}/2$, after successful transmissions). This is set by adjusting the \texttt{BACKOFF\_SLOT} parameter as shown in Figure~\ref{fig:WMP-EditorSetting}.
 
-Furthermore, after a successful or a failed transmission attempt the flow redirects the MAC to the Idle state. Supposing the station has another packet in the queue, then it will execute the \texttt{TX\_PKT\_SCHEDULER} action: recomputing a backoff.
+Nevertheless, after collisions the contention window ($CW$) is doubled but the \texttt{BACKOFF\_SLOT} will keep its value. This differs from the behavior of Basic ECA (after collisions, nodes pick a random backoff, $B\in[0,CW]$).
 
-From here, some questions are derived:
+Currently we are trying to answer the following questions:
 
-\begin{itemize}
- \item Suppose we adjust \texttt{DEFLATION\_DIV} and \texttt{DEFLATION\_SUB} so the contention window (CW) is not reset after a successful transmission (\emph{Hysteresis}). Will \texttt{TX\_PKT\_SCHEDULER} recompute a random backoff $B\in[0,CW]$?
- \item Can we assign a backoff slot for transmission that depends on the current value of CW?
- \item How does \texttt{STD} work? Can we modify this rule?
-\end{itemize}
+\begin{enumerate}
+ \item Is it possible to adjust the \texttt{BACKOFF\_SLOT} parameter as a function of $CW_{cur}$?
+ \item We already have purchased approved wireless cards that allow the modification of the MAC protocols. What is the best way to start using the WMPEditor?
+ \item Are those guys also going to INFOCOM?
+\end{enumerate}
 
 
+%SECOND VERSION. SOME QUESTIONS ANSWERED BUT OTHERS REMAIN FOR A THIRD VERSION
+% What is curious about these calculations is that they seem to be wrong. After a successful transmission~(\ref{eq:deflation}), the contention window is reset to zero because the evaluation results in a CW below the allowed limit. 
+% 
+% In the failure case~(\ref{eq:inflation}), assuming $CW_{\min}=16$, after the action \texttt{CONTENTION\_PARAMS\_UPDATE\_FAIL}, $CW=5$ evertyime. This is obviously wrong.
+% 
+% Furthermore, after a successful or a failed transmission attempt the flow redirects the MAC to the Idle state. Supposing the station has another packet in the queue, then it will execute the \texttt{TX\_PKT\_SCHEDULER} action: recomputing a backoff.
+% 
+% From here, some questions are derived:
+% 
+% \begin{itemize}
+%  \item Suppose we adjust \texttt{DEFLATION\_DIV} and \texttt{DEFLATION\_SUB} so the contention window (CW) is not reset after a successful transmission (\emph{Hysteresis}). Will \texttt{TX\_PKT\_SCHEDULER} recompute a random backoff $B\in[0,CW]$?
+%  \item Can we assign a backoff slot for transmission that depends on the current value of CW?
+%  \item How does \texttt{STD} work? Can we modify this rule?
+% \end{itemize}
+
+% FIRST VERSION. QUESTIONS WERE ANSWERED
 % Today we had the opportunity of getting a question answered by one of FLAVIA team member. This was related to the adjustment of the backoff value through a \texttt{0x0D TX\_PKT\_SCHEDULER} action parameter, namely \texttt{BACKOFF SLOT}.
 % 
 % As of now, I believe this measure just resets the backoff counter to the specified value. I could not find any other indication that this behavior can be further adjusted. Nevertheless, the option \texttt{STD} of the same \texttt{BACKOFF SLOT} parameter is supposed to mimic the behavior of DCF. 
