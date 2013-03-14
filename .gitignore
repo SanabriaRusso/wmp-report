@@ -1,0 +1,8 @@
+*.backup
+*~
+*_OLD.tex
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.log
